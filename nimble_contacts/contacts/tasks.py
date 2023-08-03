@@ -29,6 +29,8 @@ def update_contacts():
             email = contact_data['fields'].get('email')
             if email is not None:
                 email = email[0].get('value')
+            else:
+                email = f'{first_name}.{last_name}@noexist.com'
 
             if first_name and last_name:
                 contacts_to_update.append(Contact(first_name=first_name, last_name=last_name, email=email))
