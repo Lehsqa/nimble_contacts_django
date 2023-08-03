@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'contacts.apps.ContactsConfig',
     'rest_framework',
-    'django_celery_beat'
+    'django_celery_beat',
+    'drf_yasg'
 ]
 
 MIDDLEWARE = [
