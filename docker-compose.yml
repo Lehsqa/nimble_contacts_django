@@ -1,0 +1,53 @@
+version: '3.5'
+
+services:
+  web:
+    build: .
+    container_name: nimble_contacts_web
+    command: python nimble_contacts/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/nimble_contacts_django
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - redis
+  db:
+    image: postgres:14-alpine
+    container_name: nimble_contacts_db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: admin
+      POSTGRES_DB: db01
+      POSTGRES_INITDB_ARGS: "-A md5"
+  redis:
+    image: redis:7-alpine
+    container_name: nimble_contacts_redis
+    restart: always
+  celery_worker:
+    build: .
+    container_name: nimble_contacts_celery_worker
+    command: celery --workdir=./nimble_contacts -A nimble_contacts worker --loglevel=info
+    volumes:
+      - .:/nimble_contacts_django
+    depends_on:
+      - web
+  celery_beat:
+    build: .
+    container_name: nimble_contacts_celery_beat
+    command: celery --workdir=./nimble_contacts -A nimble_contacts beat --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - .:/nimble_contacts_django
+    depends_on:
+      - web
+      - celery_worker
+  flower:
+    image: mher/flower
+    build: .
+    container_name: nimble_contacts_flower
+    ports:
+      - 5555:5555
+    command: '/run_flower.sh'
+    volumes:
+      - ./run_flower.sh:/run_flower.sh
