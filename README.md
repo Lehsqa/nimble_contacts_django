@@ -15,3 +15,5 @@
 ### `http://localhost:8000/api/v1/swagger` - online documentation (Swagger UI)
 
 ### `http://localhost:8000/api/v1/contacts-search?search={text}` - get request for getting contacts by full text search
+
+### `http://localhost:5555` - Celery monitoring
