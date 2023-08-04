@@ -33,6 +33,21 @@ def full_text_search(search: str):
     return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 
+def parse_data(contact_data: dict):
+    first_name = contact_data['fields'].get('first name')[0].get('value')
+    last_name = contact_data['fields'].get('last name')[0].get('value')
+    email = contact_data['fields'].get('email')
+    if email is not None:
+        email = email[0].get('value')
+    else:
+        email = f'{first_name}.{last_name}@noexist.com'
+    created_date = datetime.strptime(contact_data['created'][:10], '%Y-%m-%d')
+    updated_date = datetime.strptime(contact_data['updated'][:10], '%Y-%m-%d')
+
+    return {'first_name': first_name, 'last_name': last_name, 'email': email, 'created_date': created_date,
+            'updated_date': updated_date}
+
+
 def manual_update():
     contacts_to_update = []
     emails_csv = set()
@@ -49,19 +64,15 @@ def manual_update():
         contacts_data = response.json()['resources']
 
         for contact_data in contacts_data:
-            first_name = contact_data['fields'].get('first name')[0].get('value')
-            last_name = contact_data['fields'].get('last name')[0].get('value')
-            email = contact_data['fields'].get('email')
-            if email is not None:
-                email = email[0].get('value')
-            else:
-                email = f'{first_name}.{last_name}@noexist.com'
+            data = parse_data(contact_data)
 
-            if email in emails_csv:
+            if data.get('email') in emails_csv:
                 continue
 
-            if first_name and last_name:
-                contacts_to_update.append(Contact(first_name=first_name, last_name=last_name, email=email))
+            if data.get('first_name') and data.get('last_name'):
+                contacts_to_update.append(Contact(first_name=data.get('first_name'),
+                                                  last_name=data.get('last_name'),
+                                                  email=data.get('email')))
 
     Contact.objects.all().delete()
     Contact.objects.bulk_create(contacts_to_update, update_conflicts=True,
