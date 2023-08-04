@@ -41,8 +41,8 @@ def parse_data(contact_data: dict):
         email = email[0].get('value')
     else:
         email = f'{first_name}.{last_name}@noexist.com'
-    created_date = datetime.strptime(contact_data['created'][:10], '%Y-%m-%d')
-    updated_date = datetime.strptime(contact_data['updated'][:10], '%Y-%m-%d')
+    created_date = datetime.strptime(contact_data['created'], '%Y-%m-%dT%H:%M:%S.%f')
+    updated_date = datetime.strptime(contact_data['updated'], '%Y-%m-%dT%H:%M:%S.%f')
 
     return {'first_name': first_name, 'last_name': last_name, 'email': email, 'created_date': created_date,
             'updated_date': updated_date}

@@ -12,7 +12,7 @@ from drf_yasg import openapi
             'search', openapi.IN_QUERY,
             description=('Full text search data'),
             type=openapi.TYPE_STRING,
-            enum=['Oleg', 'Ken', 'Francis'],
+            enum=['Oleg', 'Ken', 'Noname'],
             required=True
         ),
     ]
